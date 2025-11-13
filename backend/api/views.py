@@ -2,13 +2,17 @@ from rest_framework import viewsets, generics, permissions
 from rest_framework.response import Response
 from rest_framework_simplejwt.views import TokenObtainPairView
 from django.contrib.auth.models import User
-from .models import Product, Cart, CartItem
+from .models import Product, Cart, CartItem, Order, OrderItem
 from .serializers import (
     ProductSerializer,
     CartSerializer,
     CartItemSerializer,
-    UserRegistrationSerializer
+    UserRegistrationSerializer,
+    OrderSerializer,
+    OrderItemSerializer,
 )
+from rest_framework.views import APIView
+from django.db import transaction
 
 class UserRegistrationView(generics.CreateAPIView):
     queryset = User.objects.all()
@@ -61,3 +65,58 @@ class CartItemViewSet(viewsets.ModelViewSet):
             serializer.instance = cart_item
         except CartItem.DoesNotExist:
             serializer.save(cart=cart)
+
+class CheckoutView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request, *args, **kwargs):
+        try:
+            cart = Cart.objects.get(user=request.user)
+            cart_items = CartItem.objects.filter(cart=cart)
+
+            if not cart_items.exists():
+                return Response(
+                    {"error": "Cart is empty"}, 
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+            with transaction.atomic():
+                total_price = sum(
+                    item.product.price * item.quantity for item in cart_items
+                )
+                
+                order = Order.objects.create(
+                    user=request.user, 
+                    total_price=total_price
+                )
+
+                for item in cart_items:
+                    OrderItem.objects.create(
+                        order=order,
+                        product=item.product,
+                        quantity=item.quantity,
+                        price=item.product.price 
+                    )
+                
+                cart_items.delete()
+
+            serializer = OrderSerializer(order)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+        except Cart.DoesNotExist:
+            return Response(
+                {"error": "Cart not found"}, 
+                status=status.HTTP_404_NOT_FOUND
+            )
+        except Exception as e:
+            return Response(
+                {"error": str(e)}, 
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
+class OrderViewSet(viewsets.ReadOnlyModelViewSet):
+    serializer_class = OrderSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        return Order.objects.filter(user=self.request.user).order_by('-created_at')
