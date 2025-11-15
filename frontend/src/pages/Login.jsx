@@ -1,5 +1,8 @@
 import React, { useState, useContext } from 'react';
+import { Link } from 'react-router-dom';
 import AuthContext from '../context/AuthContext';
+import VideoBackground from '../components/VideoBackground';
+import { toast } from 'react-hot-toast'; 
 
 function Login() {
     const [username, setUsername] = useState('');
@@ -8,31 +11,79 @@ function Login() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        const result = await loginUser(username, password);
-        if (!result.success) {
-            alert("Login gagal! Cek username/password.");
-        }
+        
+        const loginPromise = loginUser(username, password);
+
+        toast.promise(
+            loginPromise,
+            {
+                loading: 'Logging in...',
+                success: (data) => {
+                    if (data.success) {
+                        return 'Login berhasil!';
+                    } else {
+                        throw new Error(data.error?.detail || 'Login gagal.');
+                    }
+                },
+                error: (err) => err.message || 'Terjadi kesalahan saat login.',
+            },
+            {
+                success: {
+                    duration: 2000,
+                },
+                error: {
+                    duration: 3000,
+                },
+            }
+        ).catch(() => { });
     };
 
     return (
-        <form onSubmit={handleSubmit}>
-            <h2>Login</h2>
-            <input
-                type="text"
-                placeholder="Username"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                required
-            />
-            <input
-                type="password"
-                placeholder="Password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-            />
-            <button type="submit">Login</button>
-        </form>
+        <VideoBackground videoSrc="/videos/jungle.mp4"> {/* Gunakan komponen VideoBackground */}
+            <div className="bg-white p-8 md:p-10 rounded-xl shadow-2xl w-full max-w-md animate-fade-in-up">
+                <h1 className="text-4xl font-bold text-gray-900 text-center mb-8">LOGIN</h1>
+                
+                <form onSubmit={handleSubmit}>
+                    <div className="mb-6">
+                        <label htmlFor="username" className="sr-only">Username</label>
+                        <input
+                            type="text"
+                            id="username"
+                            className="w-full px-5 py-3 border border-gray-300 rounded-xl shadow-sm placeholder-gray-500 focus:outline-none focus:ring-emerald-500 focus:border-emerald-500 text-lg"
+                            placeholder="Username"
+                            value={username}
+                            onChange={(e) => setUsername(e.target.value)}
+                            required
+                        />
+                    </div>
+                    <div className="mb-8">
+                        <label htmlFor="password" className="sr-only">Password</label>
+                        <input
+                            type="password"
+                            id="password"
+                            className="w-full px-5 py-3 border border-gray-300 rounded-xl shadow-sm placeholder-gray-500 focus:outline-none focus:ring-emerald-500 focus:border-emerald-500 text-lg"
+                            placeholder="Password"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            required
+                        />
+                    </div>
+                    <button
+                        type="submit"
+                        className="w-full bg-gray-900 text-white py-4 rounded-xl font-bold text-xl hover:bg-emerald-700 transition-all duration-300 shadow-md"
+                    >
+                        LOGIN
+                    </button>
+                </form>
+                
+                <p className="text-center text-gray-600 mt-8 text-md">
+                    Belum punya akun?{' '}
+                    <Link to="/register" className="text-emerald-600 hover:text-emerald-800 font-semibold transition-colors">
+                        Register
+                    </Link>
+                </p>
+            </div>
+        </VideoBackground>
     );
 }
 

@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import api from '../services/api';
-import { ShoppingBag, Box, Package, MapPin, Phone, CreditCard, Calendar, ScrollText } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { 
+    ShoppingBag, Box, Package, MapPin, Phone, CreditCard, Calendar, ScrollText, Truck, User, XCircle
+    } from 'lucide-react';
 
 function OrderDetailModal({ order, onClose }) {
     if (!order) return null;
@@ -9,58 +12,167 @@ function OrderDetailModal({ order, onClose }) {
     const totalWithShipping = subtotal + parseFloat(order.shipping_cost);
 
     return (
-        <div className="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center p-4 z-50">
-            <div className="bg-white rounded-xl shadow-2xl p-8 max-w-4xl w-full max-h-[90vh] overflow-y-auto relative animate-fade-in-up">
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+            {/* Background image */}
+            <div
+                className="absolute inset-0 bg-cover bg-center"
+                style={{
+                backgroundImage:
+                    "url('https://images.unsplash.com/photo-1470058869958-2a77ade41c02?q=80&w=1170&auto=format&fit=crop')",
+                }}
+            ></div>
+
+            {/* Dark overlay */}
+            <div className="absolute inset-0 bg-black/75 backdrop-blur-sm"></div>
+
+            <div className="bg-white rounded-3xl shadow-[0_20px_60px_rgba(0,0,0,0.3)] p-8 max-w-4xl w-full max-h-[90vh] overflow-y-auto relative animate-fade-in-up border border-slate-200/50">
                 <button 
                     onClick={onClose} 
-                    className="absolute top-4 right-4 text-gray-500 hover:text-gray-800 transition-colors"
+                    className="absolute top-6 right-6 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-full p-2 transition-all duration-200 hover:rotate-90"
                 >
-                    <XCircle className="w-7 h-7" />
+                    <XCircle className="w-6 h-6" />
                 </button>
-                <h2 className="text-3xl font-bold text-gray-900 mb-6 flex items-center gap-3">
-                    <ScrollText className="w-8 h-8 text-emerald-600" />
-                    Detail Pesanan #{order.id}
-                </h2>
+                
+                <div className="mb-8">
+                    <div className="flex items-center gap-3 mb-2">
+                        <div className="p-3 bg-emerald-500 rounded-2xl shadow-lg shadow-emerald-500/30">
+                            <ScrollText className="w-7 h-7 text-white" />
+                        </div>
+                        <div>
+                            <h2 className="text-3xl font-bold bg-gradient-to-r from-slate-800 to-slate-600 bg-clip-text text-transparent">
+                                Detail Pesanan
+                            </h2>
+                            <p className="text-sm text-slate-500 font-medium">Order #{order.id}</p>
+                        </div>
+                    </div>
+                </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
                     {/* Ringkasan Pesanan */}
-                    <div>
-                        <h3 className="text-xl font-semibold text-gray-800 mb-4 border-b pb-2">Informasi Umum</h3>
-                        <p className="flex items-center gap-2 text-gray-700 mb-2"><Calendar className="w-5 h-5 text-emerald-500" /> Tanggal: {new Date(order.created_at).toLocaleDateString()}</p>
-                        <p className="flex items-center gap-2 text-gray-700 mb-2"><CreditCard className="w-5 h-5 text-emerald-500" /> Pembayaran: {order.payment_method}</p>
-                        <p className="flex items-center gap-2 text-gray-700 mb-2"><Truck className="w-5 h-5 text-emerald-500" /> Pengiriman: {order.shipping_option} (Rp {parseFloat(order.shipping_cost).toLocaleString('id-ID')})</p>
-                        <p className="flex items-center gap-2 text-gray-700 mb-2"><ShoppingBag className="w-5 h-5 text-emerald-500" /> Total Pesanan: <span className="font-bold text-emerald-700">Rp {totalWithShipping.toLocaleString('id-ID')}</span></p>
+                    <div className="bg-gradient-to-br from-slate-50 to-slate-100/50 rounded-2xl p-6 border border-slate-200/60 shadow-sm">
+                        <h3 className="text-lg font-bold text-slate-800 mb-5 flex items-center gap-2">
+                            <div className="w-1.5 h-6 bg-gradient-to-b from-emerald-500 to-teal-600 rounded-full"></div>
+                            Informasi Umum
+                        </h3>
+                        <div className="space-y-4">
+                            <div className="flex items-center gap-3 group">
+                                <div className="p-2 bg-white rounded-xl shadow-sm group-hover:shadow-md transition-shadow">
+                                    <Calendar className="w-5 h-5 text-emerald-600" />
+                                </div>
+                                <div>
+                                    <p className="text-xs text-slate-500 font-medium">Tanggal Pesanan</p>
+                                    <p className="text-slate-800 font-semibold">{new Date(order.created_at).toLocaleDateString()}</p>
+                                </div>
+                            </div>
+                            <div className="flex items-center gap-3 group">
+                                <div className="p-2 bg-white rounded-xl shadow-sm group-hover:shadow-md transition-shadow">
+                                    <CreditCard className="w-5 h-5 text-blue-600" />
+                                </div>
+                                <div>
+                                    <p className="text-xs text-slate-500 font-medium">Metode Pembayaran</p>
+                                    <p className="text-slate-800 font-semibold">{order.payment_method}</p>
+                                </div>
+                            </div>
+                            <div className="flex items-center gap-3 group">
+                                <div className="p-2 bg-white rounded-xl shadow-sm group-hover:shadow-md transition-shadow">
+                                    <Truck className="w-5 h-5 text-purple-600" />
+                                </div>
+                                <div>
+                                    <p className="text-xs text-slate-500 font-medium">Pengiriman</p>
+                                    <p className="text-slate-800 font-semibold">{order.shipping_option}</p>
+                                    <p className="text-xs text-slate-600">Rp {parseFloat(order.shipping_cost).toLocaleString('id-ID')}</p>
+                                </div>
+                            </div>
+                            <div className="mt-4 pt-4 border-t border-slate-200">
+                                <div className="flex items-center justify-between bg-emerald-500 text-white rounded-xl p-4 shadow-lg shadow-emerald-500/20">
+                                    <div className="flex items-center gap-2">
+                                        <ShoppingBag className="w-5 h-5" />
+                                        <span className="font-semibold">Total Pesanan</span>
+                                    </div>
+                                    <span className="text-xl font-bold">Rp {totalWithShipping.toLocaleString('id-ID')}</span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
                     {/* Alamat Pengiriman */}
-                    <div>
-                        <h3 className="text-xl font-semibold text-gray-800 mb-4 border-b pb-2">Alamat Pengiriman</h3>
-                        <p className="flex items-center gap-2 text-gray-700 mb-2"><User className="w-5 h-5 text-emerald-500" /> {order.full_name}</p>
-                        <p className="flex items-center gap-2 text-gray-700 mb-2"><Phone className="w-5 h-5 text-emerald-500" /> {order.phone}</p>
-                        <p className="flex items-center gap-2 text-gray-700 mb-2"><MapPin className="w-5 h-5 text-emerald-500" /> {order.address}, {order.city}, {order.postal_code}</p>
+                    <div className="bg-gradient-to-br from-blue-50 to-indigo-100/50 rounded-2xl p-6 border border-blue-200/60 shadow-sm">
+                        <h3 className="text-lg font-bold text-slate-800 mb-5 flex items-center gap-2">
+                            <div className="w-1.5 h-6 bg-gradient-to-b from-blue-500 to-indigo-600 rounded-full"></div>
+                            Alamat Pengiriman
+                        </h3>
+                        <div className="space-y-4">
+                            <div className="flex items-start gap-3 group">
+                                <div className="p-2 bg-white rounded-xl shadow-sm group-hover:shadow-md transition-shadow">
+                                    <User className="w-5 h-5 text-blue-600" />
+                                </div>
+                                <div>
+                                    <p className="text-xs text-slate-500 font-medium">Nama Penerima</p>
+                                    <p className="text-slate-800 font-semibold">{order.full_name}</p>
+                                </div>
+                            </div>
+                            <div className="flex items-start gap-3 group">
+                                <div className="p-2 bg-white rounded-xl shadow-sm group-hover:shadow-md transition-shadow">
+                                    <Phone className="w-5 h-5 text-green-600" />
+                                </div>
+                                <div>
+                                    <p className="text-xs text-slate-500 font-medium">Nomor Telepon</p>
+                                    <p className="text-slate-800 font-semibold">{order.phone}</p>
+                                </div>
+                            </div>
+                            <div className="flex items-start gap-3 group">
+                                <div className="p-2 bg-white rounded-xl shadow-sm group-hover:shadow-md transition-shadow">
+                                    <MapPin className="w-5 h-5 text-red-600" />
+                                </div>
+                                <div>
+                                    <p className="text-xs text-slate-500 font-medium">Alamat Lengkap</p>
+                                    <p className="text-slate-800 font-semibold leading-relaxed">{order.address}, {order.city}, {order.postal_code}</p>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
                 {/* Daftar Produk dalam Pesanan */}
-                <h3 className="text-xl font-semibold text-gray-800 mb-4 border-b pb-2">Produk Dipesan</h3>
-                <div className="space-y-4">
-                    {order.items.map(item => (
-                        <div key={item.id} className="flex items-center gap-4 p-4 bg-gray-50 rounded-lg shadow-sm">
-                            <img 
-                                src={item.product.image ? item.product.image : '/placeholder-product.png'} 
-                                alt={item.product.name}
-                                className="w-16 h-16 object-cover rounded-md"
-                            />
-                            <div className="flex-grow">
-                                <p className="font-semibold text-gray-900">{item.product.name}</p>
-                                <p className="text-sm text-gray-600">Rp {parseFloat(item.price).toLocaleString('id-ID')} x {item.quantity}</p>
+                <div>
+                    <h3 className="text-lg font-bold text-slate-800 mb-5 flex items-center gap-2">
+                        <div className="w-1.5 h-6 bg-gradient-to-b from-violet-500 to-purple-600 rounded-full"></div>
+                        Produk Dipesan
+                    </h3>
+                    <div className="space-y-3">
+                        {order.items.map(item => (
+                            <div key={item.id} className="group flex items-center gap-4 p-4 bg-white rounded-2xl border border-slate-200 hover:border-emerald-300 hover:shadow-lg hover:shadow-emerald-500/10 transition-all duration-300">
+                                <div className="relative overflow-hidden rounded-xl ring-2 ring-slate-100 group-hover:ring-emerald-200 transition-all">
+                                    <img 
+                                        src={item.product.image ? item.product.image : '/placeholder-product.png'} 
+                                        alt={item.product.name}
+                                        className="w-20 h-20 object-cover group-hover:scale-110 transition-transform duration-300"
+                                    />
+                                </div>
+                                <div className="flex-grow">
+                                    <p className="font-bold text-slate-900 mb-1 group-hover:text-emerald-600 transition-colors">{item.product.name}</p>
+                                    <div className="flex items-center gap-2">
+                                        <span className="text-sm text-slate-600 bg-slate-100 px-2.5 py-1 rounded-lg font-medium">
+                                            Rp {parseFloat(item.price).toLocaleString('id-ID')}
+                                        </span>
+                                        <span className="text-slate-400">×</span>
+                                        <span className="text-sm font-semibold text-slate-700 bg-emerald-50 px-2.5 py-1 rounded-lg">
+                                            {item.quantity}
+                                        </span>
+                                    </div>
+                                </div>
+                                <div className="text-right">
+                                    <p className="text-xs text-slate-500 mb-1">Subtotal</p>
+                                    <span className="text-lg font-bold bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">
+                                        Rp {(parseFloat(item.price) * item.quantity).toLocaleString('id-ID')}
+                                    </span>
+                                </div>
                             </div>
-                            <span className="font-bold text-emerald-600">Rp {(parseFloat(item.price) * item.quantity).toLocaleString('id-ID')}</span>
-                        </div>
-                    ))}
+                        ))}
+                    </div>
                 </div>
             </div>
-        </div>
+    </div>
     );
 }
 
