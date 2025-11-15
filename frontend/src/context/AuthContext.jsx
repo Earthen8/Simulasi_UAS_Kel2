@@ -1,5 +1,4 @@
 import React, { createContext, useState, useEffect } from 'react';
-import { jwtDecode } from 'jwt-decode';
 import api from '../services/api';
 import { useNavigate } from 'react-router-dom';
 
@@ -13,8 +12,8 @@ export const AuthProvider = ({ children }) => {
     );
     
     const [user, setUser] = useState(() => 
-        localStorage.getItem('authTokens')
-            ? jwtDecode(JSON.parse(localStorage.getItem('authTokens')).access)
+        localStorage.getItem('username') 
+            ? localStorage.getItem('username') 
             : null
     );
 
@@ -29,8 +28,11 @@ export const AuthProvider = ({ children }) => {
             
             const data = response.data;
             setAuthTokens(data);
-            setUser(jwtDecode(data.access));
+            
+            setUser(username);
             localStorage.setItem('authTokens', JSON.stringify(data));
+            localStorage.setItem('username', username);
+            
             navigate('/');
             return { success: true };
 
@@ -43,6 +45,7 @@ export const AuthProvider = ({ children }) => {
         setAuthTokens(null);
         setUser(null);
         localStorage.removeItem('authTokens');
+        localStorage.removeItem('username');
         navigate('/login');
     };
 

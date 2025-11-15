@@ -3,6 +3,7 @@ import { Routes, Route } from 'react-router-dom';
 
 import Navbar from './components/Navbar';
 import ProtectedRoute from './components/ProtectedRoute';
+import RedirectIfLoggedIn from './components/RedirectIfLoggedIn'; // <-- 1. IMPOR BARU
 
 import Home from './pages/Home';
 import Login from './pages/Login';
@@ -18,11 +19,25 @@ function App() {
             <Routes>
                 {/* Rute Publik */}
                 <Route path="/" element={<Home />} />
-                <Route path="/login" element={<Login />} />
-                <Route path="/register" element={<Register />} />
                 <Route path="/products/:id" element={<ProductDetail />} />
+
+                <Route 
+                    path="/login" 
+                    element={
+                        <RedirectIfLoggedIn>
+                            <Login />
+                        </RedirectIfLoggedIn>
+                    } 
+                />
+                <Route 
+                    path="/register" 
+                    element={
+                        <RedirectIfLoggedIn>
+                            <Register />
+                        </RedirectIfLoggedIn>
+                    } 
+                />
                 
-                {/* Rute Terlindungi */}
                 <Route 
                     path="/cart" 
                     element={
