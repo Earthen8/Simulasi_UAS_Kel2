@@ -55,7 +55,7 @@ class CartItemViewSet(viewsets.ModelViewSet):
         return CartItem.objects.filter(cart=cart)
 
     def perform_create(self, serializer):
-        cart = Cart.objects.get(user=self.request.user)
+        cart, created = Cart.objects.get_or_create(user=self.request.user)
         product = serializer.validated_data['product']
         quantity = serializer.validated_data['quantity']
         

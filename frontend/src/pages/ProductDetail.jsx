@@ -8,8 +8,8 @@ function ProductDetail() {
     const { id } = useParams();
     const [product, setProduct] = useState(null);
     const [quantity, setQuantity] = useState(1);
-    const [message, setMessage] = useState(null); 
-    const { user } = useContext(AuthContext);
+    const [message, setMessage] = useState(null);
+    const { user, fetchCart } = useContext(AuthContext);
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -42,6 +42,7 @@ function ProductDetail() {
                 product_id: product.id,
                 quantity: quantity 
             });
+            await fetchCart(); // <-- REFRESH THE GLOBAL CART STATE
             setMessage({ type: 'success', text: `${quantity} ${product.name} berhasil ditambahkan!` });
         } catch (error) {
             console.error("Gagal menambah ke keranjang", error.response?.data);

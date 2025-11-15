@@ -1,4 +1,4 @@
-import React, { createContext, useState, useEffect } from 'react';
+import React, { createContext, useState, useEffect, useCallback } from 'react';
 import api from '../services/api';
 import { useNavigate } from 'react-router-dom';
 
@@ -16,8 +16,24 @@ export const AuthProvider = ({ children }) => {
             ? localStorage.getItem('username') 
             : null
     );
+    const [cart, setCart] = useState(null);
 
     const navigate = useNavigate();
+
+    const fetchCart = useCallback(async () => {
+        if (!authTokens) {
+            setCart(null);
+            return;
+        }
+        try {
+            const response = await api.get('/cart/');
+            // The API returns an array, we take the first object
+            setCart(response.data[0] || { items: [] }); 
+        } catch (error) {
+            console.error("Failed to fetch cart from context", error);
+            setCart(null);
+        }
+    }, [authTokens]);
 
     const loginUser = async (username, password) => {
         try {
@@ -46,12 +62,22 @@ export const AuthProvider = ({ children }) => {
         setUser(null);
         localStorage.removeItem('authTokens');
         localStorage.removeItem('username');
+        setCart(null); // Clear cart on logout
         navigate('/login');
     };
+
+    // Fetch cart when user is authenticated
+    useEffect(() => {
+        if (user) {
+            fetchCart();
+        }
+    }, [user, fetchCart]);
 
     const contextData = {
         user,
         authTokens,
+        cart,
+        fetchCart, // Expose fetchCart to be used by other components
         loginUser,
         logoutUser
     };

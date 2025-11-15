@@ -4,8 +4,10 @@ import AuthContext from '../context/AuthContext';
 import { ShoppingCart, User, Menu, Leaf } from 'lucide-react';
 
 function Navbar() {
-    const { user, logoutUser } = useContext(AuthContext);
+    const { user, logoutUser, cart } = useContext(AuthContext);
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+    const cartItemCount = user && cart ? cart.items.reduce((total, item) => total + item.quantity, 0) : 0;
 
     return (
         <nav className="bg-gray-900 text-white sticky top-0 z-50 shadow-lg">
@@ -21,7 +23,7 @@ function Navbar() {
                         </button>
                         <Link to="/" className="text-2xl font-bold text-emerald-400 flex items-center gap-2">
                             <Leaf className="w-7 h-7" />
-                            ECOSTORE
+                            GraStore
                         </Link>
                     </div>
                     
@@ -44,7 +46,7 @@ function Navbar() {
                         <Link to="/cart" className="relative p-2 hover:bg-gray-800 rounded-lg transition-colors">
                             <ShoppingCart className="w-5 h-5" />
                             <span className="absolute -top-1 -right-1 bg-emerald-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold">
-                                0 {/* Nanti bisa diisi jumlah item keranjang */}
+                                {cartItemCount}
                             </span>
                         </Link>
                         
