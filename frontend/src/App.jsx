@@ -1,16 +1,15 @@
 import React from 'react';
 import { Routes, Route } from 'react-router-dom';
-
 import Navbar from './components/Navbar';
 import ProtectedRoute from './components/ProtectedRoute';
-import RedirectIfLoggedIn from './components/RedirectIfLoggedIn'; // <-- 1. IMPOR BARU
-
+import RedirectIfLoggedIn from './components/RedirectIfLoggedIn';
 import Home from './pages/Home';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import ProductDetail from './pages/ProductDetail';
 import Cart from './pages/Cart';
 import OrderHistory from './pages/OrderHistory';
+import Checkout from './pages/Checkout';
 
 function App() {
     return (
@@ -51,6 +50,14 @@ function App() {
                     element={
                         <ProtectedRoute>
                             <OrderHistory />
+                        </ProtectedRoute>
+                    } 
+                />
+                <Route 
+                    path="/checkout" 
+                    element={
+                        <ProtectedRoute>
+                            <Checkout />
                         </ProtectedRoute>
                     } 
                 />

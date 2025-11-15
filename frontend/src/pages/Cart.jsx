@@ -170,12 +170,12 @@ function Cart() {
                             </span>
                         </div>
 
-                        <button 
-                            onClick={handleCheckout} 
-                            className="w-full bg-emerald-600 text-white py-4 rounded-xl font-semibold text-lg hover:bg-emerald-700 transition-all duration-300 shadow-lg"
+                        <Link 
+                            to="/checkout"
+                            className="block w-full text-center bg-emerald-600 text-white py-4 rounded-xl font-semibold text-lg hover:bg-emerald-700 transition-all duration-300 shadow-lg"
                         >
                             Lanjut ke Checkout
-                        </button>
+                        </Link>
                     </div>
                 </div>
 

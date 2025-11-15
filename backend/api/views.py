@@ -14,6 +14,7 @@ from .serializers import (
 )
 from rest_framework.views import APIView
 from django.db import transaction
+from decimal import Decimal
 
 class UserRegistrationView(generics.CreateAPIView):
     queryset = User.objects.all()
@@ -87,14 +88,34 @@ class CheckoutView(APIView):
                     status=status.HTTP_400_BAD_REQUEST
                 )
 
+            data = request.data
+            full_name = data.get('full_name')
+            phone = data.get('phone')
+            address = data.get('address')
+            city = data.get('city')
+            postal_code = data.get('postal_code')
+            payment_method = data.get('payment_method')
+            shipping_option = data.get('shipping_option')
+            shipping_cost = Decimal(data.get('shipping_cost', 0))
+
             with transaction.atomic():
-                total_price = sum(
+                subtotal = sum(
                     item.product.price * item.quantity for item in cart_items
                 )
                 
+                total_price = subtotal + shipping_cost 
+                
                 order = Order.objects.create(
                     user=request.user, 
-                    total_price=total_price
+                    total_price=total_price,
+                    full_name=full_name,
+                    phone=phone,
+                    address=address,
+                    city=city,
+                    postal_code=postal_code,
+                    payment_method=payment_method,
+                    shipping_option=shipping_option,
+                    shipping_cost=shipping_cost
                 )
 
                 for item in cart_items:
