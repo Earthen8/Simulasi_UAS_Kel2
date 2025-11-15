@@ -1,6 +1,7 @@
 from rest_framework import viewsets, generics, permissions
 from rest_framework.response import Response
 from rest_framework_simplejwt.views import TokenObtainPairView
+from rest_framework import status
 from django.contrib.auth.models import User
 from .models import Product, Cart, CartItem, Order, OrderItem
 from .serializers import (
@@ -58,13 +59,19 @@ class CartItemViewSet(viewsets.ModelViewSet):
         product = serializer.validated_data['product']
         quantity = serializer.validated_data['quantity']
         
-        try:
-            cart_item = CartItem.objects.get(cart=cart, product=product)
+        cart_item, created = CartItem.objects.get_or_create(
+            cart=cart, 
+            product=product,
+            defaults={'quantity': 0}
+        )
+        
+        if created:
+            cart_item.quantity = quantity
+        else:
             cart_item.quantity += quantity
-            cart_item.save()
-            serializer.instance = cart_item
-        except CartItem.DoesNotExist:
-            serializer.save(cart=cart)
+        
+        cart_item.save()
+        serializer.instance = cart_item
 
 class CheckoutView(APIView):
     permission_classes = [permissions.IsAuthenticated]
