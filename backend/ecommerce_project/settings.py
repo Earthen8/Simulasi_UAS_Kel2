@@ -24,9 +24,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-)9(l@-mo0_$u3o7e)dh1c1!o&$meq+c)*^(@4axuv56t2=sd65'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['e4rthen.pythonanywhere.com']
 
 
 # Application definition
@@ -129,6 +129,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
+    "grastore.netlify.app",
 ]
 
 REST_FRAMEWORK = {
