@@ -7,8 +7,27 @@ class ProductSerializer(serializers.ModelSerializer):
         model = Product
         fields = ['id', 'name', 'description', 'price', 'image']
 
-class CartItemSerializer(serializers.ModelSerializer):
+class OrderItemSerializer(serializers.ModelSerializer):
     product = ProductSerializer(read_only=True) 
+
+    class Meta:
+        model = OrderItem
+        fields = ['id', 'product', 'quantity', 'price']
+
+class OrderSerializer(serializers.ModelSerializer):
+    items = OrderItemSerializer(many=True, read_only=True)
+    user = serializers.StringRelatedField(read_only=True)
+
+    class Meta:
+        model = Order
+        fields = [
+            'id', 'user', 'created_at', 'total_price', 'items',
+            'full_name', 'phone', 'address', 'city', 'postal_code',
+            'payment_method', 'shipping_option', 'shipping_cost'
+        ]
+
+class CartItemSerializer(serializers.ModelSerializer):
+    product = ProductSerializer(read_only=True)
     product_id = serializers.PrimaryKeyRelatedField(
         queryset=Product.objects.all(), source='product', write_only=True
     )
@@ -39,18 +58,3 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
             password=validated_data['password']
         )
         return user
-    
-class OrderItemSerializer(serializers.ModelSerializer):
-    product = ProductSerializer(read_only=True)
-
-    class Meta:
-        model = OrderItem
-        fields = ['id', 'product', 'quantity', 'price']
-
-class OrderSerializer(serializers.ModelSerializer):
-    items = OrderItemSerializer(many=True, read_only=True)
-    user = serializers.StringRelatedField(read_only=True)
-
-    class Meta:
-        model = Order
-        fields = ['id', 'user', 'created_at', 'total_price', 'items']

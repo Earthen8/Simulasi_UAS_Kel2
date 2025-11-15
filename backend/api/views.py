@@ -10,7 +10,6 @@ from .serializers import (
     CartItemSerializer,
     UserRegistrationSerializer,
     OrderSerializer,
-    OrderItemSerializer,
 )
 from rest_framework.views import APIView
 from django.db import transaction
