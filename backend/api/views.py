@@ -147,3 +147,18 @@ class OrderViewSet(viewsets.ReadOnlyModelViewSet):
 
     def get_queryset(self):
         return Order.objects.filter(user=self.request.user).order_by('-created_at')
+    
+class MyTokenObtainPairView(TokenObtainPairView):
+    serializer_class = MyTokenObtainPairSerializer
+    
+    def post(self, request, *args, **kwargs):
+        if 'username' in request.data and '@' in request.data['username']:
+            try:
+                user = User.objects.get(email=request.data['username'])
+                request.data._mutable = True
+                request.data['username'] = user.username
+                request.data._mutable = False
+            except User.DoesNotExist:
+                pass
+        
+        return super().post(request, *args, **kwargs)

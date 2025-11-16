@@ -72,32 +72,11 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
         return user
     
 class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
+    username_field = User.USERNAME_FIELD
+    
     @classmethod
     def get_token(cls, user):
         token = super().get_token(user)
         token['username'] = user.username
         token['email'] = user.email
         return token
-
-    def validate(self, attrs):
-        email = attrs.get('username')
-        password = attrs.get('password')
-
-        try:
-            user = User.objects.get(email__iexact=email)
-        except User.DoesNotExist:
-            raise serializers.ValidationError('Email atau password salah.')
-
-        if not user.check_password(password):
-            raise serializers.ValidationError('Email atau password salah.')
-        
-        if not user.is_active:
-            raise serializers.ValidationError('Akun tidak aktif.')
-
-        # Generate tokens
-        refresh = self.get_token(user)
-        
-        return {
-            'refresh': str(refresh),
-            'access': str(refresh.access_token),
-        }
