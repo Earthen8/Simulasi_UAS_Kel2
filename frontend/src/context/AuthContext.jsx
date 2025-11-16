@@ -3,8 +3,9 @@ import api from '../services/api';
 import { useNavigate } from 'react-router-dom';
 import { jwtDecode } from 'jwt-decode';
 
+export const AuthContext = createContext();
+
 export const AuthProvider = ({ children }) => {
-    const AuthContext = createContext();
     
     const [user, setUser] = useState(() => 
         localStorage.getItem('authTokens')
@@ -19,18 +20,13 @@ export const AuthProvider = ({ children }) => {
     );
     
     const [cartCount, setCartCount] = useState(0);
-
     const navigate = useNavigate();
 
     const fetchCartCount = async () => {
-        if (localStorage.getItem('authTokens')) {
+        if (authTokens) {
             try {
                 const response = await api.get('/cart/');
-                if (response.data && response.data.length > 0) {
-                    setCartCount(response.data[0].items.length);
-                } else {
-                    setCartCount(0);
-                }
+                setCartCount(response.data?.[0]?.items?.length || 0);
             } catch (error) {
                 console.error("Gagal mengambil keranjang:", error);
                 setCartCount(0);
@@ -38,9 +34,7 @@ export const AuthProvider = ({ children }) => {
         }
     };    
 
-    const clearCartCount = () => {
-        setCartCount(0);
-    };
+    const clearCartCount = () => setCartCount(0);
 
     const loginUser = async (email, password) => {
         try {
@@ -51,9 +45,10 @@ export const AuthProvider = ({ children }) => {
             
             const data = response.data;
             setAuthTokens(data);
-            
+
             const decodedUser = jwtDecode(data.access);
-            setUser(decodedUser); 
+            setUser(decodedUser);
+
             localStorage.setItem('authTokens', JSON.stringify(data));
             
             await fetchCartCount();
@@ -69,7 +64,7 @@ export const AuthProvider = ({ children }) => {
         setAuthTokens(null);
         setUser(null);
         clearCartCount();
-        localStorage.removeItem('authTokens'); // <-- Hapus 'username' dari localStorage
+        localStorage.removeItem('authTokens');
         navigate('/login');
     };
 
@@ -89,5 +84,3 @@ export const AuthProvider = ({ children }) => {
         </AuthContext.Provider>
     );
 };
-
-export default AuthContext;
