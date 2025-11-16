@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-)9(l@-mo0_$u3o7e)dh1c1!o&$meq+c)*^(@4axuv56t2=sd65
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ['e4rthen.pythonanywhere.com']
+ALLOWED_HOSTS = ['e4rthen.pythonanywhere.com', 'localhost', '127.0.0.1']
 
 
 # Application definition
@@ -129,7 +129,6 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
-    "https://grastore.vercel.app/",
 ]
 
 REST_FRAMEWORK = {

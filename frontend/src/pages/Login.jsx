@@ -6,14 +6,14 @@ import { toast } from 'react-hot-toast';
 import { Eye, EyeOff } from 'lucide-react'; 
 
 function Login() {
-    const [email, setEmail] = useState(''); 
+    const [username, setUsername] = useState(''); 
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false); 
     const { loginUser } = useContext(AuthContext);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        const loginPromise = loginUser(email, password);
+        const loginPromise = loginUser(username, password);
         
         toast.promise(
             loginPromise,
@@ -40,12 +40,12 @@ function Login() {
                     <div className="mb-6">
                         <label htmlFor="email" className="sr-only">Email</label>
                         <input
-                            type="email"
-                            id="email"
+                            type="text"
+                            id="username"
                             className="w-full px-5 py-3 border border-gray-300 rounded-xl shadow-sm placeholder-gray-500 focus:outline-none focus:ring-emerald-500 focus:border-emerald-500 text-lg"
-                            placeholder="Email" 
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
+                            placeholder="Username" 
+                            value={username}
+                            onChange={(e) => setUsername(e.target.value)}
                             required
                         />
                     </div>

@@ -36,10 +36,10 @@ export const AuthProvider = ({ children }) => {
 
     const clearCartCount = () => setCartCount(0);
 
-    const loginUser = async (email, password) => {
+    const loginUser = async (username, password) => {
         try {
             const response = await api.post('/token/', {
-                username: email,
+                username: username,
                 password: password
             });
             

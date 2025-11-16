@@ -6,7 +6,7 @@ import { ShoppingCart, User, Menu, Leaf } from 'lucide-react';
 function Navbar() {
     const { user, logoutUser, cartCount, fetchCartCount } = useContext(AuthContext);
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-    const cartItemCount = user && cart ? cart.items.reduce((total, item) => total + item.quantity, 0) : 0;
+    const cartItemCount = cartCount || 0;
     
     useEffect(() => {
         if (user) {
