@@ -1,6 +1,8 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
 from .models import Product, Cart, CartItem, Order, OrderItem
+from rest_framework.validators import UniqueValidator
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
 class ProductSerializer(serializers.ModelSerializer):
     class Meta:
@@ -45,16 +47,51 @@ class CartSerializer(serializers.ModelSerializer):
         fields = ['id', 'user', 'created_at', 'items']
 
 class UserRegistrationSerializer(serializers.ModelSerializer):
-    password = serializers.CharField(write_only=True) 
+    password = serializers.CharField(write_only=True)
+    
+    email = serializers.EmailField(
+        required=True,
+        validators=[UniqueValidator(queryset=User.objects.all(), message="Email ini sudah terdaftar.")]
+    )
+    
+    username = serializers.CharField(
+        required=True,
+        validators=[UniqueValidator(queryset=User.objects.all(), message="Username ini sudah terdaftar.")]
+    )
 
     class Meta:
         model = User
-        fields = ['username', 'password', 'email']
+        fields = ['username', 'email', 'password'] 
 
     def create(self, validated_data):
         user = User.objects.create_user(
             username=validated_data['username'],
-            email=validated_data.get('email', ''),
+            email=validated_data['email'],
             password=validated_data['password']
         )
         return user
+    
+class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
+    @classmethod
+    def get_token(cls, user):
+        token = super().get_token(user)
+        token['username'] = user.username
+        return token
+
+    def validate(self, attrs):
+        email = attrs.get('username')
+        password = attrs.get('password')
+
+        try:
+            user = User.objects.get(email__iexact=email)
+        except User.DoesNotExist:
+            raise serializers.ValidationError('Email atau password salah.')
+
+        if not user.check_password(password):
+            raise serializers.ValidationError('Email atau password salah.')
+        
+        if not user.is_active:
+            raise serializers.ValidationError('User tidak aktif.')
+
+        attrs['username'] = user.username
+        return super().validate(attrs)

@@ -1,14 +1,16 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import api from '../services/api';
-import VideoBackground from '../components/VideoBackground'; 
-import { toast } from 'react-hot-toast'; 
+import VideoBackground from '../components/VideoBackground';
+import { toast } from 'react-hot-toast';
+import { Eye, EyeOff } from 'lucide-react'; 
 
 function Register() {
     const [username, setUsername] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [password2, setPassword2] = useState(''); 
+    const [password2, setPassword2] = useState('');
+    const [showPassword, setShowPassword] = useState(false);
     const navigate = useNavigate();
 
     const handleSubmit = async (e) => {
@@ -20,9 +22,9 @@ function Register() {
         }
 
         const registerPromise = api.post('/register/', {
-            username,
-            email,
-            password,
+            username: username,
+            email: email,
+            password: password,
         });
 
         toast.promise(
@@ -41,24 +43,17 @@ function Register() {
                     }
                     return errorMessage;
                 },
-            },
-            {
-                success: {
-                    duration: 3000,
-                },
-                error: {
-                    duration: 5000,
-                },
             }
         );
     };
 
     return (
-        <VideoBackground videoSrc="/videos/jungle.mp4"> { }
+        <VideoBackground videoSrc="/videos/jungle.mp4">
             <div className="bg-white p-8 md:p-10 rounded-xl shadow-2xl w-full max-w-md animate-fade-in-up">
                 <h1 className="text-4xl font-bold text-gray-900 text-center mb-8">REGISTER</h1>
                 
                 <form onSubmit={handleSubmit}>
+                    {/* --- Input Username --- */}
                     <div className="mb-6">
                         <label htmlFor="username" className="sr-only">Username</label>
                         <input
@@ -71,6 +66,8 @@ function Register() {
                             required
                         />
                     </div>
+                    
+                    {/* --- Input Email --- */}
                     <div className="mb-6">
                         <label htmlFor="email" className="sr-only">Email</label>
                         <input
@@ -83,10 +80,12 @@ function Register() {
                             required
                         />
                     </div>
-                    <div className="mb-6">
+
+                    {/* --- Input Password 1 (dengan ikon) --- */}
+                    <div className="mb-6 relative">
                         <label htmlFor="password" className="sr-only">Password</label>
                         <input
-                            type="password"
+                            type={showPassword ? "text" : "password"}
                             id="password"
                             className="w-full px-5 py-3 border border-gray-300 rounded-xl shadow-sm placeholder-gray-500 focus:outline-none focus:ring-emerald-500 focus:border-emerald-500 text-lg"
                             placeholder="Password"
@@ -94,11 +93,20 @@ function Register() {
                             onChange={(e) => setPassword(e.target.value)}
                             required
                         />
+                        <button
+                            type="button"
+                            onClick={() => setShowPassword(!showPassword)}
+                            className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-500 hover:text-emerald-600"
+                        >
+                            {showPassword ? <EyeOff className="w-6 h-6" /> : <Eye className="w-6 h-6" />}
+                        </button>
                     </div>
-                    <div className="mb-8">
+
+                    {/* --- Input Password 2 (dengan ikon) --- */}
+                    <div className="mb-8 relative">
                         <label htmlFor="password2" className="sr-only">Konfirmasi Password</label>
                         <input
-                            type="password"
+                            type={showPassword ? "text" : "password"}
                             id="password2"
                             className="w-full px-5 py-3 border border-gray-300 rounded-xl shadow-sm placeholder-gray-500 focus:outline-none focus:ring-emerald-500 focus:border-emerald-500 text-lg"
                             placeholder="Konfirmasi Password"
@@ -106,7 +114,15 @@ function Register() {
                             onChange={(e) => setPassword2(e.target.value)}
                             required
                         />
+                        <button
+                            type="button"
+                            onClick={() => setShowPassword(!showPassword)}
+                            className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-500 hover:text-emerald-600"
+                        >
+                            {showPassword ? <EyeOff className="w-6 h-6" /> : <Eye className="w-6 h-6" />}
+                        </button>
                     </div>
+                    
                     <button
                         type="submit"
                         className="w-full bg-gray-900 text-white py-4 rounded-xl font-bold text-xl hover:bg-emerald-700 transition-all duration-300 shadow-md"

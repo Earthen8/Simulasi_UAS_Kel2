@@ -96,10 +96,10 @@ function Home() {
                             Special promotions on sustainable goods.
                         </p>
                         
-                        <button className="bg-gradient-to-r from-emerald-600 to-emerald-700 text-white py-4 px-10 rounded-2xl font-bold text-lg hover:from-emerald-700 hover:to-emerald-800 transition-all duration-300 flex items-center gap-3 mx-auto shadow-xl hover:shadow-2xl hover:scale-105 transform">
+                        <a href="#our-products" className="bg-gradient-to-r from-emerald-600 to-emerald-700 text-white py-4 px-10 rounded-2xl font-bold text-lg hover:from-emerald-700 hover:to-emerald-800 transition-all duration-300 inline-flex items-center gap-3 mx-auto shadow-xl hover:shadow-2xl hover:scale-105 transform">
                             Explore Deals
                             <ArrowRight className="w-5 h-5" />
-                        </button>
+                        </a>
                     </div>
                 </div>
             </section>
@@ -136,10 +136,12 @@ function Home() {
             <section className="bg-white py-20">
                 <div className="container mx-auto px-4">
                     <div className="flex items-center justify-between mb-12">
-                        <div>
-                            <h2 className="text-4xl font-bold text-gray-900 mb-3">Produk Kami</h2>
-                            <p className="text-gray-600 text-lg">Pilihan terbaik kami untuk Anda</p>
-                        </div>
+                        <section id="our-products" className='bg-white-py-20'>
+                            <div>
+                                <h2 className="text-4xl font-bold text-gray-900 mb-3">Our Products</h2>
+                                <p className="text-gray-600 text-lg">The best choices for you</p>
+                            </div>
+                        </section>
                     </div>
                     
                     {products.length > 0 ? (

@@ -1,8 +1,15 @@
-import React, { createContext, useState, useEffect, useCallback } from 'react';
+import React, { createContext, useState, useEffect } from 'react';
 import api from '../services/api';
 import { useNavigate } from 'react-router-dom';
+import { jwtDecode } from 'jwt-decode';
 
-const AuthContext = createContext();
+    const AuthContext = createContext();
+
+    const [user, setUser] = useState(() => 
+        localStorage.getItem('authTokens')
+            ? jwtDecode(JSON.parse(localStorage.getItem('authTokens')).access)
+            : null
+    );
 
 export const AuthProvider = ({ children }) => {
     const [authTokens, setAuthTokens] = useState(() => 
@@ -16,39 +23,46 @@ export const AuthProvider = ({ children }) => {
             ? localStorage.getItem('username') 
             : null
     );
-    const [cart, setCart] = useState(null);
+    
+    const [cartCount, setCartCount] = useState(0);
 
     const navigate = useNavigate();
 
-    const fetchCart = useCallback(async () => {
-        if (!authTokens) {
-            setCart(null);
-            return;
+    const fetchCartCount = async () => {
+        if (localStorage.getItem('authTokens')) {
+            try {
+                const response = await api.get('/cart/');
+                if (response.data && response.data.length > 0) {
+                    setCartCount(response.data[0].items.length);
+                } else {
+                    setCartCount(0);
+                }
+            } catch (error) {
+                console.error("Gagal mengambil keranjang:", error);
+                setCartCount(0);
+            }
         }
-        try {
-            const response = await api.get('/cart/');
-            // The API returns an array, we take the first object
-            setCart(response.data[0] || { items: [] }); 
-        } catch (error) {
-            console.error("Failed to fetch cart from context", error);
-            setCart(null);
-        }
-    }, [authTokens]);
+    };    
 
-    const loginUser = async (username, password) => {
+    const clearCartCount = () => {
+        setCartCount(0);
+    };
+
+    const loginUser = async (email, password) => {
         try {
             const response = await api.post('/token/', {
-                username,
-                password
+                username: email,
+                password: password
             });
             
             const data = response.data;
             setAuthTokens(data);
             
-            setUser(username);
+            const decodedUser = jwtDecode(data.access);
+            setUser(decodedUser); 
             localStorage.setItem('authTokens', JSON.stringify(data));
-            localStorage.setItem('username', username);
             
+            await fetchCartCount();
             navigate('/');
             return { success: true };
 
@@ -60,26 +74,19 @@ export const AuthProvider = ({ children }) => {
     const logoutUser = () => {
         setAuthTokens(null);
         setUser(null);
-        localStorage.removeItem('authTokens');
-        localStorage.removeItem('username');
-        setCart(null); // Clear cart on logout
+        clearCartCount();
+        localStorage.removeItem('authTokens'); // <-- Hapus 'username' dari localStorage
         navigate('/login');
     };
-
-    // Fetch cart when user is authenticated
-    useEffect(() => {
-        if (user) {
-            fetchCart();
-        }
-    }, [user, fetchCart]);
 
     const contextData = {
         user,
         authTokens,
-        cart,
-        fetchCart, // Expose fetchCart to be used by other components
         loginUser,
-        logoutUser
+        logoutUser,
+        cartCount,     
+        fetchCartCount,
+        clearCartCount,
     };
 
     return (

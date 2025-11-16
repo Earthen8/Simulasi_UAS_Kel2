@@ -1,15 +1,15 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext } from 'react'; 
 import { useParams, useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import AuthContext from '../context/AuthContext';
 import { Package, Plus, Minus, CheckCircle, XCircle } from 'lucide-react';
+import { toast } from 'react-hot-toast';
 
 function ProductDetail() {
     const { id } = useParams();
     const [product, setProduct] = useState(null);
     const [quantity, setQuantity] = useState(1);
-    const [message, setMessage] = useState(null);
-    const { user, fetchCart } = useContext(AuthContext);
+    const { user, fetchCartCount } = useContext(AuthContext); 
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -37,19 +37,25 @@ function ProductDetail() {
             return;
         }
         
-        try {
-            await api.post('/cart-items/', {
-                product_id: product.id,
-                quantity: quantity 
-            });
-            await fetchCart(); // <-- REFRESH THE GLOBAL CART STATE
-            setMessage({ type: 'success', text: `${quantity} ${product.name} berhasil ditambahkan!` });
-        } catch (error) {
-            console.error("Gagal menambah ke keranjang", error.response?.data);
-            setMessage({ type: 'error', text: 'Gagal menambah ke keranjang.' });
-        }
-        
-        setTimeout(() => setMessage(null), 3000);
+        const addToCartPromise = api.post('/cart-items/', {
+            product_id: product.id,
+            quantity: quantity
+        });
+
+        toast.promise(
+            addToCartPromise,
+            {
+                loading: 'Menambahkan ke keranjang...',
+                success: async (data) => {
+                    await fetchCartCount();
+                    return `${quantity} ${product.name} berhasil ditambahkan!`;
+                },
+                error: (err) => {
+                    console.error("Gagal menambah ke keranjang", err.response?.data);
+                    return 'Gagal menambah ke keranjang.';
+                }
+            }
+        );
     };
 
     if (!product) {
@@ -116,16 +122,6 @@ function ProductDetail() {
                         >
                             Tambah ke Keranjang
                         </button>
-
-                        {/* Pop-up Notifikasi */}
-                        {message && (
-                            <div className={`mt-4 p-4 rounded-lg flex items-center gap-3 ${
-                                message.type === 'success' ? 'bg-emerald-50 text-emerald-700' : 'bg-red-50 text-red-700'
-                            }`}>
-                                {message.type === 'success' ? <CheckCircle className="w-5 h-5" /> : <XCircle className="w-5 h-5" />}
-                                <span className="font-medium">{message.text}</span>
-                            </div>
-                        )}
                     </div>
                 </div>
             </div>

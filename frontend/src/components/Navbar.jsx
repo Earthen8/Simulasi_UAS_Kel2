@@ -1,13 +1,18 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import AuthContext from '../context/AuthContext';
 import { ShoppingCart, User, Menu, Leaf } from 'lucide-react';
 
 function Navbar() {
-    const { user, logoutUser, cart } = useContext(AuthContext);
+    const { user, logoutUser, cartCount, fetchCartCount } = useContext(AuthContext);
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-
     const cartItemCount = user && cart ? cart.items.reduce((total, item) => total + item.quantity, 0) : 0;
+    
+    useEffect(() => {
+        if (user) {
+            fetchCartCount();
+        }
+    }, [user]);
 
     return (
         <nav className="bg-gray-900 text-white sticky top-0 z-50 shadow-lg">
@@ -52,7 +57,7 @@ function Navbar() {
                         
                         {user ? (
                             <div className="flex items-center gap-2">
-                                <span className="hidden sm:inline text-sm">Halo, {user}</span>
+                                <span className="hidden sm:inline text-sm">Halo, {user.username}</span>
                                 <User className="w-5 h-5" />
                                 <button 
                                     onClick={logoutUser} 
