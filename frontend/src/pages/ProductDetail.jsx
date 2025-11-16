@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext } from 'react'; 
 import { useParams, useNavigate } from 'react-router-dom';
 import api from '../services/api';
-import AuthContext from '../context/AuthContext';
+import { AuthContext } from '../context/AuthContext';
 import { Package, Plus, Minus, CheckCircle, XCircle } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 
