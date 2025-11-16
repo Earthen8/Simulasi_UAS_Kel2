@@ -10,6 +10,7 @@ from .serializers import (
     CartItemSerializer,
     UserRegistrationSerializer,
     OrderSerializer,
+    MyTokenObtainPairSerializer
 )
 from rest_framework.views import APIView
 from django.db import transaction
@@ -147,3 +148,6 @@ class OrderViewSet(viewsets.ReadOnlyModelViewSet):
 
     def get_queryset(self):
         return Order.objects.filter(user=self.request.user).order_by('-created_at')
+
+class MyTokenObtainPairView(TokenObtainPairView):
+    serializer_class = MyTokenObtainPairSerializer

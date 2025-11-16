@@ -80,20 +80,16 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
         return token
 
     def validate(self, attrs):
-        # Frontend sends 'username' field but contains email
-        email_or_username = attrs.get('username')
-        password = attrs.get('password')
+        credential = attrs.get('username', '')
+        password = attrs.get('password', '')
 
-        # Try to find user by email first
-        if '@' in email_or_username:
+        if '@' in credential:
             try:
-                user = User.objects.get(email=email_or_username)
-                attrs['username'] = user.username  # Convert to username for JWT
+                user = User.objects.get(email=credential)
+                attrs['username'] = user.username
             except User.DoesNotExist:
-                raise serializers.ValidationError('Email atau password salah.')
-        else:
-            # If it's not an email, assume it's a username and let the parent class handle it
-            pass
-        
-        # Let parent class handle authentication
+                raise serializers.ValidationError({'detail': 'Email atau password salah.'})
+            except User.MultipleObjectsReturned:
+                raise serializers.ValidationError({'detail': 'Multiple users with this email. Contact admin.'})
+
         return super().validate(attrs)
