@@ -72,8 +72,6 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
         return user
     
 class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
-    username_field = 'email' 
-    
     @classmethod
     def get_token(cls, user):
         token = super().get_token(user)
@@ -82,7 +80,7 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
         return token
 
     def validate(self, attrs):
-        email = attrs.get('email')
+        email = attrs.get('username')
         password = attrs.get('password')
 
         try:
@@ -96,7 +94,7 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
         if not user.is_active:
             raise serializers.ValidationError('Akun tidak aktif.')
 
-        # Pass username to parent class
+        # Generate tokens
         refresh = self.get_token(user)
         
         return {
