@@ -72,11 +72,28 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
         return user
     
 class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
-    username_field = User.USERNAME_FIELD
-    
     @classmethod
     def get_token(cls, user):
         token = super().get_token(user)
         token['username'] = user.username
         token['email'] = user.email
         return token
+
+    def validate(self, attrs):
+        # Frontend sends 'username' field but contains email
+        email_or_username = attrs.get('username')
+        password = attrs.get('password')
+
+        # Try to find user by email first
+        if '@' in email_or_username:
+            try:
+                user = User.objects.get(email=email_or_username)
+                attrs['username'] = user.username  # Convert to username for JWT
+            except User.DoesNotExist:
+                raise serializers.ValidationError('Email atau password salah.')
+        else:
+            # If it's not an email, assume it's a username and let the parent class handle it
+            pass
+        
+        # Let parent class handle authentication
+        return super().validate(attrs)
