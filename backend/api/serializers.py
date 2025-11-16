@@ -72,14 +72,17 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
         return user
     
 class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
+    username_field = 'email' 
+    
     @classmethod
     def get_token(cls, user):
         token = super().get_token(user)
         token['username'] = user.username
+        token['email'] = user.email
         return token
 
     def validate(self, attrs):
-        email = attrs.get('username')
+        email = attrs.get('email')
         password = attrs.get('password')
 
         try:
@@ -91,7 +94,12 @@ class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
             raise serializers.ValidationError('Email atau password salah.')
         
         if not user.is_active:
-            raise serializers.ValidationError('User tidak aktif.')
+            raise serializers.ValidationError('Akun tidak aktif.')
 
-        attrs['username'] = user.username
-        return super().validate(attrs)
+        # Pass username to parent class
+        refresh = self.get_token(user)
+        
+        return {
+            'refresh': str(refresh),
+            'access': str(refresh.access_token),
+        }
