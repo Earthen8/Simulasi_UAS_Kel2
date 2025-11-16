@@ -129,7 +129,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
-    "grastore.netlify.app",
+    "https://grastore.vercel.app/",
 ]
 
 REST_FRAMEWORK = {
