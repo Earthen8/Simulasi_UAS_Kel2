@@ -3,24 +3,18 @@ import api from '../services/api';
 import { useNavigate } from 'react-router-dom';
 import { jwtDecode } from 'jwt-decode';
 
+export const AuthProvider = ({ children }) => {
     const AuthContext = createContext();
-
+    
     const [user, setUser] = useState(() => 
         localStorage.getItem('authTokens')
             ? jwtDecode(JSON.parse(localStorage.getItem('authTokens')).access)
             : null
     );
-
-export const AuthProvider = ({ children }) => {
+    
     const [authTokens, setAuthTokens] = useState(() => 
         localStorage.getItem('authTokens')
             ? JSON.parse(localStorage.getItem('authTokens'))
-            : null
-    );
-    
-    const [user, setUser] = useState(() => 
-        localStorage.getItem('username') 
-            ? localStorage.getItem('username') 
             : null
     );
     
